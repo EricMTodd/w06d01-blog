@@ -3,11 +3,20 @@ console.log("authors.js is running...");
 
 const express = require("express");
 const router = express.Router();
+const Author = require("../models/authors");
 
 
 // Index Route
 router.get("/", (req, res) => {
-	res.render("authors/index.ejs");
+	Author.find({} , (err, allAuthors) => {
+		if (err) {
+			console.log(err, "Failed to display views/authors/index.ejs")
+		} else {
+			res.render("authors/index.ejs", {
+				"authors": allAuthors
+			});
+		}
+	})
 });
 
 
@@ -18,7 +27,14 @@ router.get("/new", (req, res) => {
 
 router.post("/", (req, res) => {
 	console.log(req.body);
-	res.send("Server has received a request.");
+	Author.create(req.body, (err, createdAuthor) => {
+		if (err) {
+			console.log(err, "Failed to create new author.")
+		} else {
+			console.log(createdAuthor, "This is the created author.");
+			res.redirect("/authors");
+		}
+	})
 });
 
 
