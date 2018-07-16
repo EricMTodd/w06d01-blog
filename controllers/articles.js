@@ -20,4 +20,48 @@ router.get("/", (req, res) => {
 });
 
 
+// New Route
+router.get("/new", (req, res) => {
+	res.render("articles/new.ejs");
+});
+
+router.post("/", (req, res) => {
+	console.log(req.body);
+	Article.create(req.body, (err, createdArticle) => {
+		if (err) {
+			console.log(err, "Failed to created new article.");
+		} else {
+			console.log(createdArticle, "This is the created article.");
+			res.redirect("/articles");
+		}
+	})
+});
+
+
+// Show Route
+router.get("/:id", (req, res) => {
+	Article.findById(req.params.id, (err, shownArticle) => {
+		if (err) {
+			console.log(err, "Failed to show author.");
+		} else {
+			res.render("articles/show.ejs", {
+				"article": shownArticle
+			});
+		}
+	})
+});
+
+
+// Delete Route
+router.delete("/:id", (req, res) => {
+	Article.findByIdAndRemove(req.params.id, (err, deletedArticle) => {
+		if (err) {
+			console.log(err, "Failed to delete author");
+		} else {
+			res.redirect("/articles");
+		}
+	})
+});
+
+
 module.exports = router;

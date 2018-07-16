@@ -25,7 +25,10 @@
 			<h2>List of Articles</h2>
 			<ul>
 				<% for (var i = 0; i < articles.length; i++) { %>
-					<li><a href="/articles/<%=articles[i].id%>"><%=articles[i].name%></a></li>
+					<li><a href="/articles/<%=articles[i].id%>"><%=articles[i].title%></a></li>
+					<form method="POST" action="/articles/<%=articles[i].id%>?_method=DELETE">
+					<button>Delete</button>
+					</form>
 				<% } %>
 			</ul>
 		</main>
