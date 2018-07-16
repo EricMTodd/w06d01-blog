@@ -8,9 +8,9 @@ const Author = require("../models/authors");
 
 // Index Route
 router.get("/", (req, res) => {
-	Author.find({} , (err, allAuthors) => {
+	Author.find({}, (err, allAuthors) => {
 		if (err) {
-			console.log(err, "Failed to display views/authors/index.ejs")
+			console.log(err, "Failed to display views/authors/index.ejs.");
 		} else {
 			res.render("authors/index.ejs", {
 				"authors": allAuthors

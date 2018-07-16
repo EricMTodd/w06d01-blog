@@ -20,8 +20,11 @@ app.use(express.static(__dirname + "/public"));
 const authorsController = require("./controllers/authors.js");
 app.use("/authors", authorsController);
 
+const articlesController = require("./controllers/articles.js");
+app.use("/articles", articlesController);
 
-// Index Route
+
+// Home Route
 app.get("/", (req, res) => {
 	res.render("index.ejs");
 });
