@@ -26,6 +26,9 @@
 		<ul>
 			<% for (let i = 0; i < authors.length; i++) { %>
 				<li><a href="/authors<%=authors[i].id%>"><%=authors[i].name%></a></li>
+				<form method="POST" action="/authors/<%=authors[i].id%>?_method=DELETE">
+				<button>Delete</button>
+				</form>
 			<% } %>
 		</ul>
 	</main>

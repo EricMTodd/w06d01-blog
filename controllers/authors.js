@@ -38,4 +38,26 @@ router.post("/", (req, res) => {
 });
 
 
+// Show Route
+router.get("/:id", (req, res) => {
+	Author.findById(req.params.id, (err, shownAuthor) => {
+		res.render("authors/show.ejs", {
+			"author": shownAuthor
+		});
+	});
+});
+
+
+// Delete Route
+router.delete("/:id", (req, res) => {
+	Author.findByIdAndRemove(req.params.id, (err, deletedAuthor) => {
+		if (err) {
+			console.log(err, "Failed to delete author.");
+		}	else {
+			res.redirect("/authors");
+		}
+	})
+});
+
+
 module.exports = router;
