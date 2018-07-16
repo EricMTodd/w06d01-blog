@@ -18,7 +18,7 @@ app.use(express.static(__dirname + "/public"));
 
 // Required controllers for router
 const authorsController = require("./controllers/authors.js");
-app.use("/authors/", authorsController);
+app.use("/authors", authorsController);
 
 
 // Index Route
