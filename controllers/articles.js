@@ -64,4 +64,29 @@ router.delete("/:id", (req, res) => {
 });
 
 
+// Edit Route
+router.get("/:id/edit", (req, res) => {
+	Article.findById(req.params.id, (err, foundArticle) => {
+		if (err) {
+			console.log(err, "Failed to find article");
+		} else {
+			res.render("articles/edit.ejs", {
+				"article": foundArticle
+			})
+		}
+	})
+});
+
+router.put("/:id", (req, res) => {
+	Article.findByIdAndUpdate(req.params.id, req.body, {new: true}, (err, updatedArticle) => {
+		if (err) {
+			console.log(err, "Failed to update model.");
+		} else {
+			console.log(updatedArticle, "Model successfully updated.");
+			res.redirect("/articles");
+		}
+	})
+});
+
+
 module.exports = router;

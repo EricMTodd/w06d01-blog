@@ -65,7 +65,7 @@ router.delete("/:id", (req, res) => {
 
 
 // Edit Route
-router.get ("/:id/edit", (req, res) => {
+router.get("/:id/edit", (req, res) => {
 	Author.findById(req.params.id, (err, foundAuthor) => {
 		if (err) {
 			console.log(err, "Failed to find author.");
