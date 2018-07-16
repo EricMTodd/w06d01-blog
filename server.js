@@ -4,9 +4,16 @@ console.log("server.js is running...");
 // Require npm modules
 const express = require("express");
 const app = express();
+const bodyParser = require("body-parser");
+const methodOverride = require("method-override");
 
 // Required databse
 require("./db/db");
+
+// Required middleware
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(methodOverride("_method"));
+app.use(express.static(__dirname + "/public"));
 
 
 // Required controllers for router
