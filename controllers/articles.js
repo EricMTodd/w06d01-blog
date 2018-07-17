@@ -26,12 +26,11 @@ router.get("/new", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-	console.log(req.body);
 	Article.create(req.body, (err, createdArticle) => {
 		if (err) {
-			console.log(err, "Failed to created new article.");
+			console.log(err, "Failed to create new article.");
 		} else {
-			console.log(createdArticle, "This is the created article.");
+			console.log("Article successfully created.");
 			res.redirect("/articles");
 		}
 	})

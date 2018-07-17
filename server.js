@@ -17,9 +17,11 @@ app.use(express.static(__dirname + "/public"));
 
 
 // Required controllers for router
+// Author controller
 const authorsController = require("./controllers/authors.js");
 app.use("/authors", authorsController);
 
+// Article controller
 const articlesController = require("./controllers/articles.js");
 app.use("/articles", articlesController);
 
