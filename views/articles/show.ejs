@@ -23,7 +23,16 @@
 		</header>
 		<main>
 			<section>
+				<h2>Articles Written by this author:</h2>
+				<ul>
+					<% for (let i = 0; i < author.articles.length; i++) { %>
+						<li><a href="/articles/<%=author.articles[i].id%>"><%=author.articles[i].title%></a></li>
+					<% } %>
+				</ul>
+			</section>
+			<section>
 				<h1><%=article.title%></h1>
+				<small>by: <a href="/authors/<%=author._id%>"><%=author.name%></a></small>
 			</section>
 			<section>
 				<p><%=article.body%></p>

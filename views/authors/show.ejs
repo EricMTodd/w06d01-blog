@@ -20,6 +20,15 @@
 	</header>
 	<main>
 		<section>
+			<h2>Articles by this author</h2>
+			<ul>
+			<% for (let i = 0; i < author.articles.length; i++) { %>
+				<li><a href="/articles/<%=author.articles[i].id%>"><%=author.articles[i].title%></a></li>
+			<% } %>
+			</ul>
+
+		</section>
+		<section>
 			<h2>Author Attributes</h2>
 			<ul>
 				<li>Name: <%=author.name%></li>

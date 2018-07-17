@@ -4,6 +4,7 @@ console.log("controllers/articles.js is running...");
 const express = require("express");
 const router = express.Router();
 const Article = require("../models/articles");
+const Author = require("../models/authors");
 
 
 // Index Route
@@ -22,17 +23,27 @@ router.get("/", (req, res) => {
 
 // New Route
 router.get("/new", (req, res) => {
-	res.render("articles/new.ejs");
+	Author.find({}, (err, allAuthors) => {
+			res.render("articles/new.ejs", {
+				"authors": allAuthors
+			});
+	})
 });
 
 router.post("/", (req, res) => {
-	Article.create(req.body, (err, createdArticle) => {
-		if (err) {
-			console.log(err, "Failed to create new article.");
-		} else {
-			console.log("Article successfully created.");
-			res.redirect("/articles");
-		}
+	// Create a new article, push a copy into the aurthors.
+	Author.findById(req.body.authorId, (err, foundAuthor) => {
+		Article.create(req.body, (err, createdArticle) => {
+			if (err) {
+				console.log(err, "Failed to create new article.");
+			} else {
+				console.log("Article successfully created.");
+				foundAuthor.articles.push(createdArticle);
+				foundAuthor.save((err, data) => {
+					res.redirect("/articles");
+				})
+			}
+		})
 	})
 });
 
@@ -43,9 +54,12 @@ router.get("/:id", (req, res) => {
 		if (err) {
 			console.log(err, "Failed to show author.");
 		} else {
-			res.render("articles/show.ejs", {
-				"article": shownArticle
-			});
+			Author.findOne({"articles._id": req.params.id}, (err, foundAuthor) => {
+					res.render("articles/show.ejs", {
+					"article": shownArticle,
+					"author": foundAuthor
+				})
+			})
 		}
 	})
 });
