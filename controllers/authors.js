@@ -4,6 +4,7 @@ console.log("authors.js is running...");
 const express = require("express");
 const router = express.Router();
 const Author = require("../models/authors");
+const Article = require("../models/articles");
 
 
 // Index Route
@@ -58,7 +59,15 @@ router.delete("/:id", (req, res) => {
 		if (err) {
 			console.log(err, "Failed to delete author.");
 		}	else {
-			res.redirect("/authors");
+			const articleIds = [];
+			for (let i = 0; i < deletedAuthor.articles.length; i++) {
+				articleIds.push(deletedAuthor.articles[i]._id);
+			}
+			Article.remove({
+				_id: { $in: articleIds }
+			}, (err, data) => {
+				res.redirect("/authors");
+			})
 		}
 	})
 });
