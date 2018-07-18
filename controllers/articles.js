@@ -10,13 +10,9 @@ const Author = require("../models/authors");
 // Index Route
 router.get("/", (req, res) => {
 	Article.find({}, (err, allArticles) => {
-		if (err) {
-			console.log(err, "Failed to display views/articles/index.ejs.");
-		} else {
 			res.render("articles/index.ejs", {
 				"articles": allArticles
 			})
-		}
 	});
 });
 
@@ -59,16 +55,12 @@ router.get("/:id", (req, res) => {
 // Delete Route
 router.delete("/:id", (req, res) => {
 	Article.findByIdAndRemove(req.params.id, (err, deletedArticle) => {
-		if (err) {
-			console.log(err, "Failed to delete author");
-		} else {
 			Author.findOne({"articles._id":req.params.id}, (err, foundAuthor) => {
 				foundAuthor.articles.id(req.params.id).remove();
 				foundAuthor.save((err, data) => {
 					res.redirect("/articles");
 				})
 			})
-		}
 	})
 });
 
