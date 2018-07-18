@@ -8,101 +8,113 @@ const Author = require("../models/authors");
 
 
 // Index Route
-router.get("/", (req, res) => {
-	Article.find({}, (err, allArticles) => {
+router.get("/", async (req, res) => {
+	if (req.session.loggedIn === true ) {
+		try {
+			const allArticles = await Article.find({});
 			res.render("articles/index.ejs", {
-				"articles": allArticles
+				"articles": allArticles,
 			})
-	});
+		} catch (err) {
+			res.send(err)
+		}
+	} else {
+		req.session.message = "Access denied, you are not logged in.";
+		res.redirect("/auth");
+	}
 });
 
 
 // New Route
-router.get("/new", (req, res) => {
-	Author.find({}, (err, allAuthors) => {
-			res.render("articles/new.ejs", {
-				"authors": allAuthors
-			});
-	})
+router.get("/new", async (req, res) => {
+	try {
+		const allAuthors = await Author.find({});
+		res.render("articles/new", {
+			"authors": allAuthors
+		})
+	} catch (err) {
+		res.send(err)
+	}
 });
 
-router.post("/", (req, res) => {
-	// Create a new article, push a copy into the aurthors.
-	Author.findById(req.body.authorId, (err, foundAuthor) => {
-		Article.create(req.body, (err, createdArticle) => {
-			foundAuthor.articles.push(createdArticle);
-			foundAuthor.save((err, data) => {
-				res.redirect("/articles");
-			})
-		})
-	})
+router.post("/", async (req, res) => {
+	try {
+		const foundAuthor = await Author.findById(req.body.authorId);
+		const createdArticle = await Author.create(req.body);
+		foundAuthor.articles.push(createdArticle);
+		const data = await foundAuthor.save();
+		res.redirect("/articles");
+	} catch (err) {
+		res.send(err);
+	}
 });
 
 
 // Show Route
-router.get("/:id", (req, res) => {
-	Article.findById(req.params.id, (err, shownArticle) => {
-			Author.findOne({"articles._id": req.params.id}, (err, foundAuthor) => {
-					res.render("articles/show.ejs", {
-					"article": shownArticle,
-					"author": foundAuthor
-				})
-			})
-	})
+router.get("/:id", async (req, res) => {
+	try {
+		const shownArticle = await Article.findById(req.params.id);
+		const foundAuthor = await Author.findOne({"articles._id": req.params.id});
+		res.render("articles/show.ejs", {
+			"article": shownArticle,
+			"author": foundAuthor
+		})
+	} catch (err) {
+		res.send(err)
+	}
 });
 
 
 // Delete Route
-router.delete("/:id", (req, res) => {
-	Article.findByIdAndRemove(req.params.id, (err, deletedArticle) => {
-			Author.findOne({"articles._id":req.params.id}, (err, foundAuthor) => {
-				foundAuthor.articles.id(req.params.id).remove();
-				foundAuthor.save((err, data) => {
-					res.redirect("/articles");
-				})
-			})
-	})
+router.delete("/:id", async (req, res) => {
+	try {
+		const deletedArticle = await Aticle.findByIdAndRemove(req.params.id);
+		const foundAuthor = await Author.findOne({"articles._id":req.params.id});
+		foundAuthor.articles.id(req.params.id).remove();
+		const data = await foundAuthor.save();
+		res.redirect("/articles");
+	} catch (err) {
+		res.send(err)
+	}
 });
 
 
 // Edit Route
-router.get("/:id/edit", (req, res) => {
-	Article.findById(req.params.id, (err, foundArticle) => {
-		Author.find({}, (err, allAuthors) => {
-			Author.findOne({"articles._id":req.params.id}, (err, foundArticleAuthor) => {
-					res.render("articles/edit.ejs", {
-						"article": foundArticle,
-						"authors": allAuthors,
-						"articleAuthor": foundArticleAuthor
-				})
-			})
+router.get("/:id/edit", async (req, res) => {
+	try {
+		const foundArticle = await Article.findById(req.params.id);
+		const allAuthors = await Author.find({});
+		const foundArticleAuthor = await Author.findOne({"articles._id":req.params.id});
+		res.render("articles/edit.ejs", {
+			"article": foundArticle,
+			"authors": allAuthors,
+			"articleAuthor": foundArticleAuthor
 		})
-	})
+	} catch (err) {
+		res.send(err)
+	}
 });
 
-router.put("/:id", (req, res) => {
-	Article.findByIdAndUpdate(req.params.id, req.body, {new: true}, (err, updatedArticle) => {
-			Author.findOne({"articles._id":req.params.id}, (err, foundAuthor) => {
-				if (foundAuthor._id.toString() !== req.body.authorId) {
-						foundAuthor.articles.id(req.params.id).remove();
-						foundAuthor.save((err, savedFoundAuthor) => {
-							Author.findById(req.body.authorId, (err, newAuthor) => {
-								newAuthor.articles.push(updatdedArticle);
-								newAuthor.save((err, savedNewAuthor) => {
-									res.redirect("/articles/"+req.params.id);
-								})
-							})
-						})
-				} else {
-				foundAuthor.articles.id(req.params.id).remove();
-				foundAuthor.articles.push(updatedArticle);
-				foundAuthor.save((err, data) => {
-					res.redirect("/articles/"+req.params.id);
-				})
-			}
-
-		})
-	})
+router.put("/:id", async (req, res) => {
+	try {
+		const updatedArticle = await Article.findByIdAndUpdate(req.params.id, req.body, {new: true});
+		const foundAuthor = await Author.findOne({"articles._id":req.params.id});
+		if (foundAuthore._id.toString() !== req.body.authorId) {
+			foundAuthor.articles.id(req.params.id).remove();
+			const savedFoundAuthor = await foundAuthor.save();
+			const newAuthor = await Author.findById(req.body.authorId);
+			newAuthor.articles.push(updatedArticle);
+			const savedNewAuthor = await newAuthor.save();
+			res.redirect("/articles/"+req.params.id);
+		} else {
+			foundAuthor.articles.id(req.params.id).remove();
+			foundAuthor.articles.push(updatedArticle);
+			const data = await foundAuthor.save();
+			res.redirect("/articles/"+req.params.id);
+		}
+	} catch (err) {
+		res.send(err)
+	}
 });
 
 
