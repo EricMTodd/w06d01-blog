@@ -8,12 +8,20 @@ const Article = require("../models/articles");
 
 
 // Index Route
-router.get("/", (req, res) => {
-	Author.find({}, (err, allAuthors) => {
+router.get("/", async (req, res) => {
+	if (req.session.loggedin === true ) {
+		try {
+			const allAuthors = await Author.find({});
 			res.render("authors/index.ejs", {
 				"authors": allAuthors
-			});
-	})
+			})
+		} catch (err) {
+			res.send(err)
+		}
+	} else {
+		req.session.message = "Access denied, you are not logged in.";
+		res.redirect("/auth");
+	}
 });
 
 
@@ -22,55 +30,64 @@ router.get("/new", (req, res) => {
 	res.render("authors/new.ejs");
 });
 
-router.post("/", (req, res) => {
-	console.log(req.body);
-	Author.create(req.body, (err, createdAuthor) => {
-			console.log(createdAuthor, "This is the created author.");
-			res.redirect("/authors");
-	})
+router.post("/", async (req, res) => {
+	try {
+		const createdAuthor = await Author.create(req.body);
+		res.redirect("/authors")
+	} catch (err) {
+		res.send(err)
+	}
 });
 
 
 // Show Route
-router.get("/:id", (req, res) => {
-	Author.findById(req.params.id, (err, shownAuthor) => {
-			res.render("authors/show.ejs", {
+router.get("/:id", async (req, res) => {
+	try {
+		const shownAuthor = await Author.findById(req.params.id);
+		res.render("authors/show.ejs", {
 			"author": shownAuthor
-			});	
-	});
+		})
+	} catch (err) {
+		res.send(err)
+	}
 });
 
 
 // Delete Route
-router.delete("/:id", (req, res) => {
-	Author.findByIdAndRemove(req.params.id, (err, deletedAuthor) => {
-			const articleIds = [];
-			for (let i = 0; i < deletedAuthor.articles.length; i++) {
-				articleIds.push(deletedAuthor.articles[i]._id);
-			}
-			Article.remove({
-				_id: { $in: articleIds }
-			}, (err, data) => {
-				res.redirect("/authors");
-			})
-	})
+router.delete("/:id", async (req, res) => {
+	try {
+		const deletedAuthor = await Author.findByIdAndRemove(req.params.id);
+		const articleIds = [];
+		for (let i = 0; i < deletedAuthor.articles.length; i++) {
+			articleIds.push(deletedAuthor.articles[i]._id);
+		}
+			const data = await Article.remove( { _id: { $in: articleIds } } );
+			res.redirect("/authors");
+	} catch (err) {
+		res.send(err)
+	}
 });
 
 
 // Edit Route
-router.get("/:id/edit", (req, res) => {
-	Author.findById(req.params.id, (err, foundAuthor) => {
-			res.render("authors/edit.ejs", {
+router.get("/:id/edit", async (req, res) => {
+	try {
+		const foundAuthor = await Author.findById(req.params.id);
+		res.render("authors/edit.ejs", {
 			"author": foundAuthor
 		})
-	});
+	} catch (err) {
+		res.send(err)
+	}
 });
 
-router.put("/:id", (req, res) => {
-	Author.findByIdAndUpdate(req.params.id, req.body, {new: true}, (err, updatedAuthor) => {
-			console.log(updatedAuthor, "Model successfully updated.");
-			res.redirect("/authors");
-	})
+router.put("/:id", async (req, res) => {
+	try {
+		const updatedAuthor = await Author.findByIdAndUpdate(req.params.id, req.body, {new: true});
+		res.redirect("/authors");
+	} catch (err) {
+		res.send(err)
+	}
 });
 
 
